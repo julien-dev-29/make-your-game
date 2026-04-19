@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Player */
+.entity {
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  background: lime;
+  will-change: transform;
+}
+
+/* UI */
+#ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+}
+
+#game-board {
+  height: 800px;
+  width: 1000px;
+  border: 1px solid cadetblue;
+}
+
+/* Pause menu */
+#pauseMenu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 20px;
+  border: 2px solid white;
+  z-index: 20;
+}
+
+.hidden {
+  display: none;
+}

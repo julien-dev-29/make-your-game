@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>JS Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="game">
+    <div id="player" class="entity"></div>
+
+    <!-- UI -->
+    <div id="ui">
+      <div id="score">Score: 0</div>
+      <div id="lives">Lives: 3</div>
+      <div id="timer">Time: 60</div>
+      <div id="game-board"></div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pauseMenu" class="hidden">
+      <h2>Paused</h2>
+      <button id="continueBtn">Continue</button>
+      <button id="restartBtn">Restart</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+
+</html>
