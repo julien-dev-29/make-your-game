@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8" />
@@ -9,14 +9,19 @@
 
 <body>
   <div id="game">
-    <div id="player" class="entity"></div>
 
     <!-- UI -->
     <div id="ui">
-      <div id="score">Score: 0</div>
-      <div id="lives">Lives: 3</div>
-      <div id="timer">Time: 60</div>
-      <div id="game-board"></div>
+      <div class="ui-left">
+        <div class="">
+          <div id="score">Score: 0</div>
+          <div id="lives">Lives: 3</div>
+        </div>
+        <div id="timer">Time: 60</div>
+      </div>
+      <div id="game-board">
+        <div id="player" class="entity"></div>
+      </div>
     </div>
 
     <!-- Pause Menu -->
@@ -27,7 +32,7 @@
     </div>
   </div>
 
-  <script src="main.js"></script>
+  <script src="main.js" type="module"></script>
 </body>
 
 </html>
