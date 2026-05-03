@@ -1,6 +1,9 @@
 const keys = {};
 
-window.addEventListener("keydown", (e) => keys[e.key] = true);
-window.addEventListener("keyup", (e) => keys[e.key] = false);
-
-export const isKeyPressed = (key) => keys[key];
+window.addEventListener("keydown", (e) => {
+  keys[e.code] = true;
+});
+window.addEventListener("keyup", (e) => {
+  keys[e.code] = false;
+});
+export const isKeyPressed = (code) => keys[code];

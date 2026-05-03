@@ -3,12 +3,22 @@ import { isKeyPressed } from "./controls.js";
 import { checkBorderCollision } from "./collision.js";
 
 export const update = (/** @type Player*/ player, deltaTime) => {
-  const movement = player.speed * deltaTime;
+  if (isKeyPressed("ArrowRight") || isKeyPressed("d")) {
+    player.moveToRight(deltaTime);
+  }
+  if (isKeyPressed("ArrowLeft") || isKeyPressed("a")) {
+    player.moveToLeft(deltaTime);
+  }
+  if (isKeyPressed("ArrowUp") || isKeyPressed("w")) {
+    player.moveUp(deltaTime);
+  }
+  if (isKeyPressed("ArrowDown") || isKeyPressed("s")) {
+    player.moveDown(deltaTime);
+  }
 
-  if (isKeyPressed("ArrowRight") || isKeyPressed("d")) player.x += movement;
-  if (isKeyPressed("ArrowLeft") || isKeyPressed("a")) player.x -= movement;
-  if (isKeyPressed("ArrowUp") || isKeyPressed("w")) player.y -= movement;
-  if (isKeyPressed("ArrowDown") || isKeyPressed("s")) player.y += movement;
+  if (isKeyPressed("Space")) {
+    player.strike();
+  }
 
   checkBorderCollision(player);
 

@@ -1,7 +1,7 @@
 :root {
   --bg: rgb(0, 0, 0);
   --color: rgb(251, 251, 251);
-  --eye-color: rgb(219, 219, 219);
+  --eye-color: rgb(63, 190, 175);
   --hat-color: rgb(162, 204, 238);
 }
 
@@ -21,16 +21,171 @@ body {
 #player {
   position: relative;
   width: 50px;
-  height: 50px;
+  height: 40px;
   background-color: var(--color);
   border-radius: 15px;
 }
 
-#hat {
+.move-right .eye {
   position: absolute;
+  background-color: var(--eye-color);
+  width: 15px;
+  height: 15px;
+  top: 10px;
+  right: 10px;
+  border-radius: 50%;
+}
+
+.move-right .eye::before {
+  position: absolute;
+  content: "";
+  width: 15px;
+  height: 2px;
+  left: 0px;
+  top: -1px;
+  transform: rotate(5deg);
+  background-color: var(--eye-color);
+}
+
+.move-left .eye {
+  position: absolute;
+  background-color: var(--eye-color);
+  width: 15px;
+  height: 15px;
+  top: 10px;
+  left: 10px;
+  border-radius: 50%;
+}
+
+.move-left .eye::before {
+  position: absolute;
+  content: "";
+  width: 15px;
+  height: 2px;
+  right: 0px;
+  top: -1px;
+  transform: rotate(-5deg);
+  background-color: var(--eye-color);
+}
+
+.move-up .left-eye {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: var(--eye-color);
+}
+
+.move-up .left-eye::before {
+  position: absolute;
+  content: "";
+  width: 15px;
+  height: 2px;
+  right: 0px;
+  top: -1px;
+  transform: rotate(-5deg);
+  background-color: var(--eye-color);
+}
+
+.move-down .left-eye {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: var(--eye-color);
+  border-radius: 50%;
+  left: 5px;
+  bottom: 10px;
+}
+
+.move-down .left-eye::before {
+  position: absolute;
+  content: "";
+  width: 15px;
+  height: 2px;
+  right: 0px;
+  top: -1px;
+  transform: rotate(-5deg);
+  background-color: var(--eye-color);
+}
+
+.shield {
+  position: absolute;
+}
+
+.move-left .sword {
+  position: absolute;
+  width: 6px;
+  height: 50px;
+  background-color: var(--color);
+  top: -30px;
+  right: 55px;
+  transform-origin: bottom center;
+}
+
+.move-left .sword::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: -4px;
+  width: 14px;
+  height: 6px;
   background-color: var(--hat-color);
-  top: -15px;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  width: 50px;
-  height: 20px;
+}
+
+.move-left .sword--striking {
+  animation: sword-swing-left 600ms ease-out;
+}
+
+.move-right .sword {
+  position: absolute;
+  width: 6px;
+  height: 50px;
+  background-color: var(--color);
+  top: -30px;
+  left: 55px;
+  transform-origin: bottom center;
+}
+
+.move-right .sword::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: -4px;
+  width: 14px;
+  height: 6px;
+  background-color: var(--hat-color);
+}
+
+.move-right .sword--striking {
+  animation: sword-swing-right 600ms ease-out;
+}
+
+@keyframes sword-swing-right {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  25% {
+    transform: rotate(-30deg) translate(10px, -20px);
+  }
+  50% {
+    transform: rotate(90deg) translate(30px, -10px);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes sword-swing-left {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  25% {
+    transform: rotate(30deg) translate(-10px, -20px);
+  }
+  50% {
+    transform: rotate(-90deg) translate(-30px, 10px);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
