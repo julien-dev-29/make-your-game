@@ -108,6 +108,30 @@ body {
   background-color: var(--eye-color);
 }
 
+.move-down .right-eye {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: var(--eye-color);
+  border-radius: 50%;
+  right: 5px;
+  bottom: 10px;
+}
+
+.move-down .right-eye::before {
+  position: absolute;
+  content: "";
+  width: 15px;
+  height: 2px;
+  right: 0px;
+  top: -1px;
+  transform: rotate(5deg);
+  background-color: var(--eye-color);
+}
+
+.move-down .sword {
+}
+
 .shield {
   position: absolute;
 }

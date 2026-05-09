@@ -57,7 +57,7 @@ export class Player {
   moveDown(deltaTime) {
     this.$element.classList.remove(...this.$element.classList);
     this.$element.classList.add("move-down");
-    this.$rightEye.classList.add("eye");
+    this.$rightEye.classList.add("right-eye");
     this.$leftEye.classList.add("left-eye");
     this.y += this.speed * deltaTime;
   }
