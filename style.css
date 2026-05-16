@@ -1,8 +1,11 @@
 :root {
   --bg: rgb(0, 0, 0);
-  --color: rgb(251, 251, 251);
-  --eye-color: rgb(63, 190, 175);
+  --color: #ffffff;
+  --eye-color: black;
   --hat-color: rgb(162, 204, 238);
+  --face-color: #fee786;
+  --right-eye-width: 5px;       
+  --left-eye-width: 5px;
 }
 
 *,
@@ -26,7 +29,17 @@ body {
   border-radius: 15px;
 }
 
-.move-right .eye {
+.move-down .face {
+  border-radius: 5px;
+  position: absolute;
+  top: 8px;
+  left: 10%;
+  width: 40px;
+  height: 25px;
+  background-color: var(--face-color);
+}
+
+/* .move-right .eye {
   position: absolute;
   background-color: var(--eye-color);
   width: 15px;
@@ -85,15 +98,16 @@ body {
   top: -1px;
   transform: rotate(-5deg);
   background-color: var(--eye-color);
-}
+} */
 
 .move-down .left-eye {
+  z-index: 50;
   position: absolute;
-  width: 15px;
-  height: 15px;
+  width: 5px;
+  height: 13px;
   background-color: var(--eye-color);
   border-radius: 50%;
-  left: 5px;
+  left: 13px;
   bottom: 10px;
 }
 
@@ -102,19 +116,20 @@ body {
   content: "";
   width: 15px;
   height: 2px;
-  right: 0px;
+  right: -2px;
   top: -1px;
-  transform: rotate(-5deg);
+  transform: rotate(5deg);
   background-color: var(--eye-color);
 }
 
 .move-down .right-eye {
+  z-index: 50;
   position: absolute;
-  width: 15px;
-  height: 15px;
+  width: 5px;
+  height: 13px;
   background-color: var(--eye-color);
   border-radius: 50%;
-  right: 5px;
+  right: 13px;
   bottom: 10px;
 }
 
@@ -123,9 +138,9 @@ body {
   content: "";
   width: 15px;
   height: 2px;
-  right: 0px;
+  left: -2px;
   top: -1px;
-  transform: rotate(5deg);
+  transform: rotate(-5deg);
   background-color: var(--eye-color);
 }
 
@@ -136,7 +151,7 @@ body {
   position: absolute;
 }
 
-.move-left .sword {
+/* .move-left .sword {
   position: absolute;
   width: 6px;
   height: 50px;
@@ -158,9 +173,9 @@ body {
 
 .move-left .sword--striking {
   animation: sword-swing-left 600ms ease-out;
-}
+} */
 
-.move-right .sword {
+/* .move-right .sword {
   position: absolute;
   width: 6px;
   height: 50px;
@@ -182,7 +197,7 @@ body {
 
 .move-right .sword--striking {
   animation: sword-swing-right 600ms ease-out;
-}
+} */
 
 @keyframes sword-swing-right {
   0% {

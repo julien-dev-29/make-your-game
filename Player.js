@@ -14,6 +14,7 @@ export class Player {
     this.$element.id = "player";
     this.$leftEye = document.createElement("div");
     this.$rightEye = document.createElement("div");
+    this.$face = document.createElement("div");
     this.$sword = document.createElement("div");
     this.$sword.classList.add("sword");
     this.$shield = document.createElement("div");
@@ -21,6 +22,7 @@ export class Player {
     this.$element.append(this.$leftEye);
     this.$element.append(this.$rightEye);
     this.$element.append(this.$sword);
+    this.$element.append(this.$face);
   }
   strike() {
     if (this.strikeCooldown) return;
@@ -59,6 +61,7 @@ export class Player {
     this.$element.classList.add("move-down");
     this.$rightEye.classList.add("right-eye");
     this.$leftEye.classList.add("left-eye");
+    this.$face.classList.add("face");
     this.y += this.speed * deltaTime;
   }
 }
