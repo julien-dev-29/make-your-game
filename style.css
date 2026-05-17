@@ -4,8 +4,12 @@
   --eye-color: black;
   --hat-color: rgb(162, 204, 238);
   --face-color: #fee786;
-  --right-eye-width: 5px;       
+  --right-eye-width: 5px;
   --left-eye-width: 5px;
+  --face-border-width: 1px;
+  --face-border-color: #343a38;
+  --core-color: #1154fa;
+  --aerial-color: #e4287c;
 }
 
 *,
@@ -30,6 +34,7 @@ body {
 }
 
 .move-down .face {
+  border: var(--face-border-width) solid var(--face-border-color);
   border-radius: 5px;
   position: absolute;
   top: 8px;
@@ -37,6 +42,60 @@ body {
   width: 40px;
   height: 25px;
   background-color: var(--face-color);
+}
+
+.move-down .core {
+  position: absolute;
+  width: 30px;
+  height: 20px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  background-color: var(--core-color);
+  bottom: -20px;
+  left: 10px;
+}
+
+.move-down .aerial {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  left: 20px;
+  top: -10px;
+  background-color: var(--aerial-color);
+}
+
+.move-down .left-hand {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  left: 5px;
+  bottom: -10px;
+  background-color: var(--aerial-color);
+}
+
+.move-down .right-hand {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  bottom: -10px;
+  right: 5px;
+  background-color: var(--aerial-color);
+}
+
+.move-down .left-leg {
+  position: absolute;
+  width: 5px;
+  height: 15px;
+  background-color: var(--color);
+}
+
+.move-down .right-leg {
+  position: absolute;
+  width: 5px;
+  height: 15px;
+  background-color: var(--color);
 }
 
 /* .move-right .eye {
@@ -198,6 +257,28 @@ body {
 .move-right .sword--striking {
   animation: sword-swing-right 600ms ease-out;
 } */
+
+.timer-board-container {
+  margin-top: 50px;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.timer-board {
+  width: 250px;
+  padding: 20px;
+  opacity: 75%;
+  background-color: rgb(17, 17, 17);
+  border: 3px solid cyan;
+  color: white;
+
+  font-size: 24px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+
+  clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
+}
 
 @keyframes sword-swing-right {
   0% {

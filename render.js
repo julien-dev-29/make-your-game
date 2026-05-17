@@ -1,3 +1,3 @@
-export const render = (player) => {
+export const render = (player, timer) => {
   
 };

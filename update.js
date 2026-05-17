@@ -2,7 +2,7 @@ import { Player } from "./Player.js";
 import { isKeyPressed } from "./controls.js";
 import { checkBorderCollision } from "./collision.js";
 
-export const update = (/** @type Player*/ player, deltaTime) => {
+export const update = (/** @type Player*/ player, timer, deltaTime) => {
   if (isKeyPressed("ArrowRight") || isKeyPressed("d")) {
     player.moveToRight(deltaTime);
   }
