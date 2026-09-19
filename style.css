@@ -8,3 +8,7 @@ body{background:#05060f;color:#e8ecff;font-family:system-ui,sans-serif;display:f
 .hidden{display:none!important}
 button{padding:10px 18px;font-size:16px;cursor:pointer}
 .ent{position:absolute;top:0;left:0;will-change:transform}
+.player{border-radius:6px}
+.enemy{border-radius:4px}
+.pb{border-radius:2px}
+.eb{border-radius:50%}
