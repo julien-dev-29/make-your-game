@@ -1,0 +1,16 @@
+import assert from 'node:assert';
+import { createWorld } from '../js/entities.js';
+const layer = { appendChild(){} };
+const w = createWorld(layer);
+assert.equal(w.enemies.length, 10);
+assert.equal(w.pBullets.length, 40);
+assert.equal(w.eBullets.length, 100);
+assert.equal(w.walls.length, 2);
+w.firePlayer(1, 0);
+assert.equal(w.pBullets.filter(b => b.active).length, 1);
+for (let i = 0; i < 13; i++) w.spawnEnemy('blob', 100 + i * 10, 100);
+assert.equal(w.enemies.filter(e => e.active).length, 10);
+w.reset();
+assert.equal(w.enemies.filter(e => e.active).length, 0);
+assert.equal(w.player.hp, 3);
+console.log('entities ok');
