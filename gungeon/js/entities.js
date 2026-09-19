@@ -16,14 +16,9 @@ export function createWorld(layer) {
   const enemies = makePool(layer, 'enemy', 10, 26, 26, '#ff4d6d');
   const pBullets = makePool(layer, 'pb', 40, 5, 5, '#ffe14d');
   const eBullets = makePool(layer, 'eb', 100, 7, 7, '#ff8b3d');
-  const walls = [
-    { x: 200, y: 220, w: 120, h: 30, el: makeDiv(layer, 'wall', 120, 30, '#3a3568') },
-    { x: 480, y: 350, w: 120, h: 30, el: makeDiv(layer, 'wall', 120, 30, '#3a3568') },
-  ];
-  for (const wl of walls) { wl.el.style.display = 'block'; wl.el.style.transform = `translate3d(${wl.x}px,${wl.y}px,0)`; }
   function get(pool) { return pool.find(e => !e.active); }
   return {
-    player, enemies, pBullets, eBullets, walls,
+    player, enemies, pBullets, eBullets,
     spawnEnemy(kind, x, y) {
       const e = get(enemies); if (!e) return null;
       e.active = true; e.kind = kind; e.x = x; e.y = y; e.t = 0; e.fireT = kind === 'shooter' ? 1.0 : 2.0;

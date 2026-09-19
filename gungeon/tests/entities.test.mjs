@@ -5,7 +5,7 @@ const w = createWorld(layer);
 assert.equal(w.enemies.length, 10);
 assert.equal(w.pBullets.length, 40);
 assert.equal(w.eBullets.length, 100);
-assert.equal(w.walls.length, 2);
+assert.ok(!('walls' in w));
 w.firePlayer(1, 0);
 assert.equal(w.pBullets.filter(b => b.active).length, 1);
 for (let i = 0; i < 13; i++) w.spawnEnemy('blob', 100 + i * 10, 100);
