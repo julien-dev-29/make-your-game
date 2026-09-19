@@ -27,6 +27,7 @@ export function createWorld(layer) {
     spawnEnemy(kind, x, y) {
       const e = get(enemies); if (!e) return null;
       e.active = true; e.kind = kind; e.x = x; e.y = y; e.t = 0; e.fireT = kind === 'shooter' ? 1.0 : 2.0;
+      e.el.style.background = kind === 'shooter' ? '#c77dff' : kind === 'turret' ? '#ffa03d' : '#ff4d6d';
       return e;
     },
     firePlayer(dx, dy) {

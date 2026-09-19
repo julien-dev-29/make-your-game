@@ -35,7 +35,7 @@ function reset() {
   game.score = 0; game.hp = 3; game.wave = 0; game.elapsed = 0; game.rollCd = 0;
   api.fireCd = 0; acc = 0;
 }
-function start() { reset(); game.state = 'playing'; ui.show(null); }
+function start() { reset(); game.state = 'playing'; ui.show(null); last = performance.now(); }
 function togglePause() {
   if (game.state === 'playing') { game.state = 'paused'; ui.show('pause-menu'); }
   else if (game.state === 'paused') { game.state = 'playing'; ui.show(null); last = performance.now(); }
