@@ -1,0 +1,12 @@
+import assert from 'node:assert';
+import { aabb, STEP, step } from '../js/physics.js';
+import { createWorld } from '../js/entities.js';
+assert.equal(STEP, 1 / 120);
+assert.ok(aabb({ x: 0, y: 0, w: 10, h: 10 }, { x: 5, y: 5, w: 10, h: 10 }));
+const world = createWorld({ appendChild(){} });
+const input = { isDown: (c) => c === 'KeyD', aimDir: () => ({ x: 0, y: 0 }) };
+const api = { fireCd: 0, onKill() {}, onHit() {} };
+const x0 = world.player.x;
+step(world, input, STEP, api);
+assert.ok(world.player.x > x0);
+console.log('physics ok');
