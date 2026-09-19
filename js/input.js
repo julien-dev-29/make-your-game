@@ -12,7 +12,10 @@ export function createInput() {
   function blur() { keys.clear(); }
   return {
     keys,
-    ...st,
+    get onPause() { return st.onPause; },
+    set onPause(fn) { st.onPause = fn; },
+    get onConfirm() { return st.onConfirm; },
+    set onConfirm(fn) { st.onConfirm = fn; },
     isDown(c) { return keys.has(c); },
     attach() {
       if (typeof window !== 'undefined' && window.addEventListener) {
@@ -28,6 +31,6 @@ export function createInput() {
         window.removeEventListener('blur', blur);
       }
     },
-    _kd: kd, _ku: ku,
+    _kd: kd, _ku: ku, _blur: blur,
   };
 }
