@@ -9,3 +9,6 @@ body{background:#0b0a12;color:#f2ecff;font-family:system-ui,sans-serif;display:f
 button{padding:10px 18px;font-size:16px;cursor:pointer}
 .ent{position:absolute;top:0;left:0;will-change:transform}
 .wall{background:#3a3568!important}
+.tilemap{pointer-events:none}
+.tile{position:absolute;top:0;left:0;width:32px;height:32px}
+.tile svg{display:block}
