@@ -35,7 +35,9 @@ export function createWorld(layer) {
       return b;
     },
     reset() {
-      for (const p of [...enemies, ...pBullets, ...eBullets]) p.active = false;
+      for (const e of enemies) e.active = false;
+      for (const b of pBullets) b.active = false;
+      for (const b of eBullets) b.active = false;
       player.x = 386; player.y = 540; player.invuln = 0; player.active = true;
     },
   };

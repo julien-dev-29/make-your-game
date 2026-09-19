@@ -1,0 +1,5 @@
+Task 1: complete (commits 4d13a3c..4ee600a, review clean)
+Task 2: complete (commits 4ee600a..b8cb4e6, review clean after fix)
+Task 3: complete (commits b8cb4e6..118b542, review clean)
+Task 4: complete (commits 118b542..8b5faf6, review pass; minors: hitbox alloc/step, double-onHit same step -> Task 6)
+Task 5: complete (commits 8b5faf6..fca5481, review pass; minors: float score display -> Task 6)

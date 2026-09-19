@@ -7,7 +7,7 @@ export function bindUI(els, game) {
       if (acc < 0.25) return;
       acc = 0;
       t.textContent = game.timeLeft.toFixed(1);
-      s.textContent = String(game.score);
+      s.textContent = String(Math.floor(game.score));
       l.textContent = String(game.lives);
     },
     fps(text) { f.textContent = text; },
@@ -18,7 +18,7 @@ export function bindUI(els, game) {
     },
     gameover(win) {
       document.getElementById('gameover-title').textContent = win ? 'YOU WIN' : 'GAME OVER';
-      document.getElementById('gameover-stats').textContent = `Score ${game.score} · Time ${game.elapsed.toFixed(1)}s`;
+      document.getElementById('gameover-stats').textContent = `Score ${Math.floor(game.score)} · Time ${game.elapsed.toFixed(1)}s`;
     },
   };
 }
