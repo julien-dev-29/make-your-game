@@ -1,0 +1,11 @@
+import assert from 'node:assert';
+import { createWorld } from '../js/entities.js';
+import { createRoom } from '../js/room.js';
+const world = createWorld({ appendChild(){} });
+const room = createRoom(world);
+assert.deepEqual(room.waveSizes, [3, 5, 7]);
+room.update(0.1);
+assert.ok(world.enemies.filter(e => e.active).length > 0);
+room.reset();
+assert.equal(room.wave, 0);
+console.log('room ok');
