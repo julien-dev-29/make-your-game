@@ -4,6 +4,24 @@ export function aabb(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 const HITBOX = { x: 0, y: 0, w: 10, h: 10 };
+import { COLS, ROWS, TS } from './tiles.js';
+function tileSolid(tm, px, py) {
+  const c = Math.floor(px / TS), r = Math.floor(py / TS);
+  if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return true;
+  const t = tm.tiles[r * COLS + c];
+  return t !== 1 && t !== 4;
+}
+function cornerHit(tm, x, y, w, h) {
+  return tileSolid(tm, x + 1, y + 1) || tileSolid(tm, x + w - 1, y + 1)
+    || tileSolid(tm, x + 1, y + h - 1) || tileSolid(tm, x + w - 1, y + h - 1);
+}
+function moveGrid(e, tm, mx, my) {
+  if (!cornerHit(tm, e.x + mx, e.y, e.w, e.h)) e.x += mx;
+  if (!cornerHit(tm, e.x, e.y + my, e.w, e.h)) e.y += my;
+}
+function bulletHitWall(tm, b) {
+  return tileSolid(tm, b.x + 2, b.y + 2);
+}
 const MOVES = [['KeyA', 'KeyQ', -1, 0], ['KeyD', 1, 0], ['KeyW', 'KeyZ', 0, -1], ['KeyS', 0, 1]];
 function moveKeys(input) {
   let dx = 0, dy = 0;
@@ -25,19 +43,12 @@ export function step(world, input, dt, api) {
   if (wantRoll && p.rollT <= 0 && p.rollCd <= 0 && (dx || dy)) { p.rollT = 0.35; p.rollCd = 0.9; p.invuln = Math.max(p.invuln, 0.35); }
   const spd = p.rollT > 0 ? 520 : 260;
   if (p.rollT > 0) p.rollT -= dt;
-  p.x += dx * spd * dt;
-  p.y += dy * spd * dt;
+  const mx = dx * spd * dt, my = dy * spd * dt;
+  const tm = world.tilemap;
+  if (tm) moveGrid(p, tm, mx, my);
+  else { p.x += mx; p.y += my; }
   p.x = Math.min(W - p.w, Math.max(0, p.x));
   p.y = Math.min(H - p.h, Math.max(0, p.y));
-  for (const wl of world.walls) {
-    if (aabb(p, wl)) {
-      const ox1 = (p.x + p.w) - wl.x, ox2 = (wl.x + wl.w) - p.x;
-      const oy1 = (p.y + p.h) - wl.y, oy2 = (wl.y + wl.h) - p.y;
-      const m = Math.min(ox1, ox2, oy1, oy2);
-      if (m === ox1) p.x = wl.x - p.w; else if (m === ox2) p.x = wl.x + wl.w;
-      else if (m === oy1) p.y = wl.y - p.h; else p.y = wl.y + wl.h;
-    }
-  }
   api.fireCd -= dt;
   const aim = input.aimDir();
   let ax = aim.x, ay = aim.y;
@@ -48,10 +59,17 @@ export function step(world, input, dt, api) {
     e.t += dt;
     const dxp = p.x - e.x, dyp = p.y - e.y;
     const d = Math.hypot(dxp, dyp) || 1;
-    if (e.kind === 'blob') { e.x += (dxp / d) * 70 * dt; e.y += (dyp / d) * 70 * dt; }
+    if (e.kind === 'blob') {
+      const mxx = (dxp / d) * 70 * dt, myy = (dyp / d) * 70 * dt;
+      if (world.tilemap) moveGrid(e, world.tilemap, mxx, myy);
+      else { e.x += mxx; e.y += myy; }
+    }
     else if (e.kind === 'shooter') {
-      if (d > 260) { e.x += (dxp / d) * 90 * dt; e.y += (dyp / d) * 90 * dt; }
-      else if (d < 200) { e.x -= (dxp / d) * 60 * dt; e.y -= (dyp / d) * 60 * dt; }
+      let mxx = 0, myy = 0;
+      if (d > 260) { mxx = (dxp / d) * 90 * dt; myy = (dyp / d) * 90 * dt; }
+      else if (d < 200) { mxx = -(dxp / d) * 60 * dt; myy = -(dyp / d) * 60 * dt; }
+      if (world.tilemap) moveGrid(e, world.tilemap, mxx, myy);
+      else { e.x += mxx; e.y += myy; }
       e.fireT -= dt;
       if (e.fireT <= 0) { e.fireT = 1.6; world.fireEnemy(e.x + 9, e.y + 9, (dxp / d) * 140, (dyp / d) * 140); }
     } else {
@@ -70,11 +88,13 @@ export function step(world, input, dt, api) {
   for (const b of world.pBullets) {
     if (!b.active) continue;
     b.x += b.vx * dt; b.y += b.vy * dt;
+    if (world.tilemap && bulletHitWall(world.tilemap, b)) b.active = false;
     if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20) b.active = false;
   }
   for (const b of world.eBullets) {
     if (!b.active) continue;
     b.x += b.vx * dt; b.y += b.vy * dt;
+    if (world.tilemap && bulletHitWall(world.tilemap, b)) b.active = false;
     if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20) b.active = false;
   }
   for (const b of world.pBullets) {
