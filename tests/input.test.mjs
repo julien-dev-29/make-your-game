@@ -1,0 +1,11 @@
+import assert from 'node:assert';
+import { createInput } from '../js/input.js';
+globalThis.window ??= { addEventListener(){}, removeEventListener(){} };
+const input = createInput();
+input._kd({ code: 'ArrowLeft', repeat: false, preventDefault(){} });
+input._kd({ code: 'ArrowLeft', repeat: true, preventDefault(){} });
+assert.ok(input.isDown('ArrowLeft'));
+assert.equal(input.keys.size, 1);
+input._ku({ code: 'ArrowLeft' });
+assert.ok(!input.isDown('ArrowLeft'));
+console.log('input ok');
