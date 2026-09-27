@@ -1,5 +1,5 @@
-import { level } from "../level.js";
-export function createGameBoard(inputs, player) {
+import { createCell } from "../cell.js";
+export function createGameBoard(inputs, player, level, bombs) {
   const elmt = document.querySelector(".gameboard");
 
   function update() {
@@ -12,22 +12,27 @@ export function createGameBoard(inputs, player) {
     } else if (inputs.pressed.has("ArrowDown")) {
       y += 1;
     }
-    //clamping();
   }
 
   function render() {
     elmt.innerHTML = "";
     level.forEach((row, i) => {
       row.forEach((col, j) => {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
+        const cell = createCell(bombs);
         if (i == player.y && j === player.x) {
-          cell.classList.add("player");
+          cell.addPLayer();
         }
         if (col === 1) {
-          cell.classList.add("wall")
+          cell.addWall();
+        } else if (col === 2) {
+          cell.addDestructible();
+        } else if (col === 3) {
+          let bomb = player.getBombs().find((b) => b.x === j && b.y === i);
+          cell.addBomb(bomb);
+        } else if (col === 4) {
+          cell.addFire();
         }
-        elmt.append(cell);
+        elmt.append(cell.elmt);
       });
     });
   }

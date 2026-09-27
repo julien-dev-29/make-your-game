@@ -1,10 +1,11 @@
 export function createInputs() {
   const pressed = new Set();
   const isArrowInput = (e) =>
-    e.key == "ArrowUp" ||
-    e.key == "ArrowDown" ||
-    e.key == "ArrowLeft" ||
-    e.key == "ArrowRight";
+    e.key === " " ||
+    e.key === "ArrowUp" ||
+    e.key === "ArrowDown" ||
+    e.key === "ArrowLeft" ||
+    e.key === "ArrowRight";
 
   function init() {
     window.addEventListener("keydown", (e) => {
