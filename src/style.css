@@ -1,0 +1,30 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: rgb(42, 42, 42);
+  display: grid;
+  place-content: center;
+}
+
+.cell {
+  z-index: 50;
+  width: 32px;
+  height: 32px;
+  background-color: #1D603A;
+}
+
+.wall {
+  background-color: #696969;
+  box-shadow: inset 3px 3px #424242, inset -3px -3px #C2C2C2;
+}
+
+.gameboard {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+}
