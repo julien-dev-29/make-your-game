@@ -1,17 +1,26 @@
 export class Player {
-  private _hDir = 1;
-  private _vDir = 1;
-  private _speed = 200;
+
   private _name: string;
   private _position: { x: number; y: number };
+  private _pressedKeys: Set<string>;
 
-  constructor(name: string, position: { x: number; y: number }) {
+  constructor(
+    name: string,
+    position: { x: number; y: number },
+    pressedKey: Set<string>,
+  ) {
     this._name = name;
     this._position = position;
+    this._pressedKeys = pressedKey;
   }
 
-  update(deltaTime: number): void {
-
+  update(): void {
+    if (this._pressedKeys.has("ArrowLeft")) {
+      this._position.x += 1;
+    }
+    if (this._pressedKeys.has("ArrowRight")) {
+      this.position.y += 1;
+    }
   }
 
   public get name(): string {
