@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bomberman Tutorial — Build the Game Step by Step</title>
+  <meta name="description" content="Step-by-step web tutorial to build the grid-step Bomberman clone in this repo: input, board, player, bombs, engine, render at 60 FPS." />
+  <style>
+    :root {
+      --bg: #1c1c1c;
+      --bg2: #242424;
+      --panel: #2a2a2a;
+      --line: #3a3a3a;
+      --text: #f0ede6;
+      --muted: #b9b3a6;
+      --green: #1d603a;
+      --green2: #2c8a54;
+      --accent: #ffd166;
+      --aqua: #4de3ff;
+      --crate: #b07a3f;
+      --danger: #ff6b6b;
+      --radius: 12px;
+      --max: 1080px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--aqua); }
+    header.topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(28,28,28,.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      max-width: var(--max); margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .logo {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: grid; place-content: center; font-weight: 800;
+      background: linear-gradient(135deg, var(--green2), #123f27);
+      border: 1px solid #ffffff22;
+    }
+    .brand { font-weight: 800; letter-spacing: .2px; }
+    .brand small { display: block; color: var(--muted); font-weight: 500; font-size: 12px; }
+    nav.links { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block; text-decoration: none; color: #111;
+      background: var(--accent); border-radius: 999px; padding: 8px 14px;
+      font-weight: 700; font-size: 14px; border: 1px solid #00000033;
+    }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    .btn:hover { filter: brightness(1.07); }
+    .progress-wrap { max-width: var(--max); margin: 0 auto; padding: 10px 20px 0; }
+    .progress-label { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+    .progress { height: 8px; background: #111; border-radius: 99px; overflow: hidden; border: 1px solid var(--line); margin-top: 6px; }
+    .progress > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green2), var(--aqua)); transition: width .3s; }
+    .layout { max-width: var(--max); margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 250px 1fr; gap: 22px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } aside.toc { position: static; } }
+    aside.toc {
+      position: sticky; top: 118px; align-self: start;
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px; font-size: 14px;
+    }
+    aside.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+    aside.toc ol { list-style: none; display: grid; gap: 2px; }
+    aside.toc a { display: block; padding: 7px 9px; border-radius: 8px; color: var(--text); text-decoration: none; }
+    aside.toc a:hover, aside.toc a.active { background: #ffffff12; }
+    aside.toc a span.n {
+      display: inline-grid; place-content: center; width: 22px; height: 22px; border-radius: 7px;
+      background: #00000055; border: 1px solid var(--line); font-size: 12px; margin-right: 8px;
+    }
+    main { min-width: 0; }
+    .hero {
+      background: linear-gradient(180deg, #2c8a5433, transparent), var(--panel);
+      border: 1px solid var(--line); border-radius: 16px; padding: 28px;
+      overflow: hidden; position: relative;
+    }
+    .hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.1; margin: 8px 0 10px; }
+    .hero p.lead { color: var(--muted); font-size: 17px; max-width: 62ch; }
+    .pill {
+      display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase; color: #0d2a1b; background: var(--accent);
+      padding: 4px 10px; border-radius: 999px;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+    @media (max-width: 700px) { .hero-grid { grid-template-columns: 1fr; } }
+    .card {
+      background: #1f1f1f; border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card h3 { font-size: 15px; margin-bottom: 8px; }
+    .card ul { padding-left: 18px; color: var(--muted); font-size: 14px; }
+    section.step {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 16px; padding: 24px; margin-top: 18px;
+      scroll-margin-top: 130px;
+    }
+    section.step h2 { font-size: 22px; margin-bottom: 4px; }
+    section.step .sub { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    section.step h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent); }
+    section.step p, section.step li { font-size: 15px; color: #e8e4da; }
+    section.step ul, section.step ol { padding-left: 20px; margin: 8px 0; display: grid; gap: 6px; }
+    code.inline { background: #111; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: 13.5px; }
+    .codeblock { position: relative; margin: 12px 0; }
+    .codeblock pre {
+      background: #111; border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px; overflow: auto; font-size: 13px; line-height: 1.55;
+    }
+    .copy {
+      position: absolute; top: 8px; right: 8px; cursor: pointer;
+      background: #ffffff14; color: var(--text); border: 1px solid var(--line);
+      border-radius: 8px; padding: 5px 10px; font-size: 12px;
+    }
+    .copy:hover { background: #ffffff22; }
+    .files { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .files span { font-size: 12.5px; background: #111; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--muted); font-family: ui-monospace, monospace; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+    th { background: #111; color: var(--accent); }
+    .demo-board {
+      display: grid; grid-template-columns: repeat(9, 30px); gap: 2px;
+      background: #111; padding: 10px; border-radius: 10px; border: 1px solid var(--line);
+      width: max-content; margin: 12px 0;
+    }
+    .demo-cell { width: 30px; height: 30px; background: var(--green); border-radius: 4px; display: grid; place-content: center; font-size: 16px; }
+    .demo-cell.wall { background: #696969; box-shadow: inset 2px 2px #424242, inset -2px -2px #c2c2c2; }
+    .demo-cell.me { background: var(--aqua); }
+    .demo-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .demo-controls button { background: #111; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+    .tip { border-left: 4px solid var(--green2); background: #2c8a5422; padding: 10px 14px; border-radius: 0 10px 10px 0; margin: 12px 0; font-size: 14px; }
+    .warn { border-left: 4px solid var(--danger); background: #ff6b6b18; padding: 10px 14px; border-radius: 0 10px 10px 0; margin: 12px 0; font-size: 14px; }
+    .check {
+      display: flex; gap: 10px; align-items: flex-start; background: #111;
+      border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 14px;
+    }
+    .check input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--green2); }
+    .stepnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+    footer { max-width: var(--max); margin: 20px auto 60px; padding: 0 20px; color: var(--muted); font-size: 13px; }
+    kbd { background: #111; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; font-size: 13px; font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">💣</div>
+      <div class="brand">Bomberman Workshop<small>make-your-game · grid-step edition · 15 × 13 · 60 FPS</small></div>
+      <nav class="links">
+        <a class="btn ghost" href="/">▶ Play game</a>
+        <a class="btn" href="#setup">Start tutorial</a>
+      </nav>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="progressText">0 / 8 steps done</span><span>progress auto-saves in this browser</span></div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>Steps</h2>
+      <ol id="toc">
+        <li><a href="#setup"><span class="n">0</span>Setup</a></li>
+        <li><a href="#input"><span class="n">1</span>Input (held keys)</a></li>
+        <li><a href="#board"><span class="n">2</span>Level + board</a></li>
+        <li><a href="#player"><span class="n">3</span>Player grid-step</a></li>
+        <li><a href="#bombs"><span class="n">4</span>Bombs + enemies</a></li>
+        <li><a href="#engine"><span class="n">5</span>Engine + states</a></li>
+        <li><a href="#render"><span class="n">6</span>Render + HUD</a></li>
+        <li><a href="#playtest"><span class="n">7</span>Playtest + next</a></li>
+      </ol>
+      <div class="tip" style="margin-top:12px">Press <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> in the Step 3 demo to feel “grid-step” movement.</div>
+    </aside>
+
+    <main>
+      <div class="hero">
+        <span class="pill">Web tutorial · TypeScript + plain DOM · no canvas</span>
+        <h1>Build this Bomberman,<br />one grid cell at a time.</h1>
+        <p class="lead">You will recreate the exact game in this repo: a single-player Bomberman on a 15×13 pillar grid, keyboard-only, with bombs, wandering enemies, pause menu, HUD (time / score / lives / FPS) and a <code class="inline">requestAnimationFrame</code> engine. Each step has code to copy, a test to prove it works, and a checkbox.</p>
+        <div class="hero-grid">
+          <div class="card">
+            <h3>✅ What you’ll end up with</h3>
+            <ul>
+              <li>Hold-to-walk movement (150&nbsp;ms per cell, no key spam)</li>
+              <li>Cross-shaped bombs, crates, chain reactions</li>
+              <li>Pause / restart, score, 3 lives, win &amp; game-over screens</li>
+              <li>Only 2 DOM layers, transform-only motion → 60 FPS</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>📦 What you need</h3>
+            <ul>
+              <li>Node 20+, this repo, ~2 hours</li>
+              <li>Basic TypeScript + DOM (<code class="inline">div</code>, classes, events)</li>
+              <li>Commands: <code class="inline">npm install</code>, <code class="inline">npm run dev</code>, <code class="inline">npx vitest run</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 0 -->
+      <section class="step" id="setup">
+        <h2>Step 0 — Setup the project</h2>
+        <div class="sub">Files: <code class="inline">package.json</code> · <code class="inline">index.html</code> · <code class="inline">src/main.ts</code> · 10 min</div>
+        <ol>
+          <li>Install and start: <code class="inline">npm install</code> then <code class="inline">npm run dev</code> → open the Vite URL.</li>
+          <li>Keep <code class="inline">index.html</code> minimal — one <code class="inline">#app</code> div, one module script:
+          </li>
+        </ol>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>&lt;div id="app"&gt;&lt;/div&gt;
+&lt;script type="module" src="/src/main.ts"&gt;&lt;/script&gt;</code></pre></div>
+        <ol start="3">
+          <li><code class="inline">src/main.ts</code> only wires modules together (input → board → player → engine → render). No game logic lives here.</li>
+          <li>Check tests run: <code class="inline">npx vitest run src/player/player.spec.ts</code></li>
+        </ol>
+        <div class="tip">Rule for the whole tutorial: <strong>plain DOM only</strong> — no canvas, no frameworks. The board is 195 <code class="inline">div.cell</code>s; entities move with <code class="inline">transform: translate3d()</code>.</div>
+        <div class="check"><input type="checkbox" data-step="setup" id="c-setup" /><label for="c-setup"><strong>I can run the dev server and the tests.</strong> (tick to save progress)</label></div>
+        <div class="stepnav"><span></span><a class="btn" href="#input">Next: Input →</a></div>
+      </section>
+
+      <!-- STEP 1 -->
+      <section class="step" id="input">
+        <h2>Step 1 — Input: held keys + edge triggers</h2>
+        <div class="sub">Files: <code class="inline">src/input/input.ts</code> (+ create <code class="inline">src/input/input.spec.ts</code>) · 15 min</div>
+        <div class="files"><span>MODIFY src/input/input.ts</span><span>CREATE src/input/input.spec.ts</span></div>
+        <p>Movement must keep working while a key is <strong>held</strong> (no spam-clicking). Bombs and pause must fire <strong>once per press</strong> (edge trigger). So we keep two things: a <code class="inline">Set</code> of held move codes, and one-shot queued flags for Space / P / Enter.</p>
+        <h3>1. Failing test first</h3>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>import { describe, expect, test } from "vitest";
+import { createInput } from "./input";
+
+describe("input", () =&gt; {
+  test("tracks held keys and consumes bomb edge", () =&gt; {
+    const input = createInput();
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "ArrowLeft" }));
+    expect(input.pressedKeys.has("ArrowLeft")).toBe(true);
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "Space" }));
+    expect(input.consumeBomb()).toBe(true);
+    expect(input.consumeBomb()).toBe(false); // edge: second read is false
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "ArrowLeft" }));
+    expect(input.pressedKeys.has("ArrowLeft")).toBe(false);
+    input.destroy();
+  });
+});</code></pre></div>
+        <h3>2. Minimal implementation</h3>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>const MOVE_CODES = new Set([
+  "ArrowUp","ArrowDown","ArrowLeft","ArrowRight",
+  "KeyW","KeyA","KeyS","KeyD",
+]);
+const HANDLED = new Set([...MOVE_CODES, "Space","KeyP","Escape","Enter"]);
+
+export function createInput() {
+  const pressedKeys = new Set&lt;string&gt;();
+  let lastDirection: string | null = null;
+  let bombQueued = false, pauseQueued = false, confirmQueued = false;
+
+  const down = (e: KeyboardEvent) =&gt; {
+    if (!HANDLED.has(e.code)) return;
+    e.preventDefault();            // stop page scroll on arrows/space
+    if (e.repeat) return;          // ignore OS key-repeat for edge triggers
+    if (MOVE_CODES.has(e.code)) { pressedKeys.add(e.code); lastDirection = e.code; }
+    if (e.code === "Space") bombQueued = true;
+    if (e.code === "KeyP" || e.code === "Escape") pauseQueued = true;
+    if (e.code === "Enter") confirmQueued = true;
+  };
+  const up = (e: KeyboardEvent) =&gt; {
+    if (MOVE_CODES.has(e.code)) {
+      pressedKeys.delete(e.code);
+      if (lastDirection === e.code) {
+        const rest = [...pressedKeys];
+        lastDirection = rest.length ? rest[rest.length - 1] : null;
+      }
+    }
+  };
+  window.addEventListener("keydown", down);
+  window.addEventListener("keyup", up);
+  return {
+    pressedKeys,
+    get lastDirection() { return lastDirection; },
+    consumeBomb() { const b = bombQueued; bombQueued = false; return b; },
+    consumePause() { const p = pauseQueued; pauseQueued = false; return p; },
+    consumeConfirm() { const c = confirmQueued; confirmQueued = false; return c; },
+    destroy() {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    },
+  };
+}</code></pre></div>
+        <p>Run <code class="inline">npx vitest run src/input/input.spec.ts</code> → green. Commit: <code class="inline">feat: add held-key input with edge triggers</code>.</p>
+        <div class="warn">⚠️ Gotchas: forget <code class="inline">e.repeat</code> guard and Space drops 10 bombs. Forget <code class="inline">preventDefault()</code> and the page scrolls on arrows.</div>
+        <div class="check"><input type="checkbox" data-step="input" id="c-input" /><label for="c-input"><strong>Input test passes.</strong> Held arrows stay in the Set; Space is consumed once.</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#setup">← Setup</a><a class="btn" href="#board">Next: Level + board →</a></div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" id="board">
+        <h2>Step 2 — Level + board: tiles, safe spawn, collisions</h2>
+        <div class="sub">Files: <code class="inline">src/level/level1.ts</code> · <code class="inline">src/game/game-board.ts</code> · 20 min</div>
+        <div class="files"><span>MODIFY src/level/level1.ts</span><span>MODIFY src/game/game-board.ts</span><span>CREATE src/game/game-board.spec.ts</span></div>
+        <table>
+          <tr><th>Tile</th><th>Value</th><th>Meaning</th><th>Walkable?</th></tr>
+          <tr><td>🟩 Floor</td><td><code class="inline">0</code></td><td>can walk, can place bomb</td><td>yes</td></tr>
+          <tr><td>📦 Crate</td><td><code class="inline">1</code></td><td>destructible, blocks, explodes into floor + score</td><td>no</td></tr>
+          <tr><td>⬜ Wall</td><td><code class="inline">2</code></td><td>border + pillars, stops explosions</td><td>no</td></tr>
+        </table>
+        <p>The base map is the classic pillar maze (walls every 2 cells). <code class="inline">buildLevel1Grid()</code> returns a <strong>fresh copy</strong> each call (so restart is trivial), scatters crates on alternating cells, then clears a safe zone around spawn <code class="inline">(1,1)</code>:</p>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>export function buildLevel1Grid(): number[][] {
+  const grid = BASE.map((r) =&gt; [...r]); // deep copy one row at a time
+  grid.forEach((row, y) =&gt; row.forEach((v, x) =&gt; {
+    if (v === 0 &amp;&amp; (x + y) % 2 === 1) grid[y][x] = 1; // crates
+  }));
+  [[1,1],[2,1],[1,2]].forEach(([x, y]) =&gt; { grid[y][x] = 0; }); // safe zone
+  return grid;
+}</code></pre></div>
+        <p><code class="inline">Gameboard</code> owns that mutable copy and answers the only two questions gameplay needs:</p>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>export class Gameboard {
+  constructor(private _grid: number[][]) {}
+  get grid() { return this._grid; }
+  inBounds(x: number, y: number) {
+    return y &gt;= 0 &amp;&amp; y &lt; this._grid.length &amp;&amp; x &gt;= 0 &amp;&amp; x &lt; this._grid[0].length;
+  }
+  isWalkable(x: number, y: number) {
+    return this.inBounds(x, y) &amp;&amp; this._grid[y][x] === 0;
+  }
+  destroyAt(x: number, y: number) { // crate -&gt; floor, returns true if destroyed
+    if (!this.inBounds(x, y) || this._grid[y][x] !== 1) return false;
+    this._grid[y][x] = 0;
+    return true;
+  }
+}</code></pre></div>
+        <p>Test: spawn walkable, border wall blocks, a crate destroys into floor. Run <code class="inline">npx vitest run src/game/game-board.spec.ts</code>.</p>
+        <div class="check"><input type="checkbox" data-step="board" id="c-board" /><label for="c-board"><strong>Board tests pass.</strong> Spawn zone is floor, walls block, crates break.</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#input">← Input</a><a class="btn" href="#player">Next: Player →</a></div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" id="player">
+        <h2>Step 3 — Player: grid-step with cooldown</h2>
+        <div class="sub">Files: <code class="inline">src/player/player.ts</code> · <code class="inline">src/player/player.spec.ts</code> · 20 min</div>
+        <p>No pixel physics: the player lives on integer cells and steps <strong>one cell per 150&nbsp;ms</strong> while a direction is held. Last-pressed direction wins, walls cancel the step (but still consume the cooldown, so holding into a wall doesn’t teleport later).</p>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>const DIRS: Record&lt;string, { dx: number; dy: number }&gt; = {
+  ArrowUp: { dx: 0, dy: -1 }, KeyW: { dx: 0, dy: -1 },
+  ArrowDown: { dx: 0, dy: 1 }, KeyS: { dx: 0, dy: 1 },
+  ArrowLeft: { dx: -1, dy: 0 }, KeyA: { dx: -1, dy: 0 },
+  ArrowRight: { dx: 1, dy: 0 }, KeyD: { dx: 1, dy: 0 },
+};
+
+export class Player {
+  static STEP_MS = 150;
+  private _cooldown = 0;
+  constructor(private _name: string, private _position: { x: number; y: number }) {}
+  get position() { return this._position; }
+  reset(x: number, y: number) { this._position = { x, y }; this._cooldown = 0; }
+
+  tryStep(code: string, board: { isWalkable(x: number, y: number): boolean }) {
+    const d = DIRS[code];
+    if (!d) return false;
+    const nx = this._position.x + d.dx, ny = this._position.y + d.dy;
+    if (!board.isWalkable(nx, ny)) return false;
+    this._position = { x: nx, y: ny };
+    return true;
+  }
+  update(dtMs: number, board: { isWalkable(x: number, y: number): boolean },
+         input: { pressedKeys: Set&lt;string&gt;; lastDirection: string | null }) {
+    this._cooldown -= dtMs;
+    const code = input.lastDirection &amp;&amp; input.pressedKeys.has(input.lastDirection)
+      ? input.lastDirection
+      : [...input.pressedKeys].pop() ?? null;
+    if (!code || this._cooldown &gt; 0) return false;
+    const moved = this.tryStep(code, board);
+    this._cooldown = Player.STEP_MS;
+    return moved;
+  }
+}</code></pre></div>
+        <h3>Try it — mini grid-step demo</h3>
+        <p>Focus the demo (click it), then hold arrow keys. Notice: movement is cell-by-cell with a fixed rhythm — that’s the 150&nbsp;ms cooldown.</p>
+        <div class="demo-board" id="demoBoard" tabindex="0" aria-label="Mini grid demo, use arrow keys"></div>
+        <div class="demo-controls">
+          <button data-demo="up">↑</button><button data-demo="left">←</button><button data-demo="down">↓</button><button data-demo="right">→</button>
+          <button id="demoReset">Reset</button>
+        </div>
+        <div class="check"><input type="checkbox" data-step="player" id="c-player" /><label for="c-player"><strong>Player tests pass</strong> (steps once per cooldown; wall at (1,0) blocks from spawn).</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#board">← Board</a><a class="btn" href="#bombs">Next: Bombs →</a></div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" id="bombs">
+        <h2>Step 4 — Bombs + enemies</h2>
+        <div class="sub">Files: <code class="inline">src/game/bomb.ts</code> · <code class="inline">src/game/enemy.ts</code> · 25 min</div>
+        <div class="files"><span>CREATE src/game/bomb.ts</span><span>CREATE src/game/enemy.ts</span><span>CREATE src/game/combat.spec.ts</span></div>
+        <h3>Bombs: cross blast, blocked by walls, stops at first crate</h3>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>export function computeBlast(grid: number[][], sx: number, sy: number, range: number) {
+  const cells = [{ x: sx, y: sy }];
+  const destroyed: { x: number; y: number }[] = [];
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  for (const [dx, dy] of dirs) {
+    for (let i = 1; i &lt;= range; i++) {
+      const x = sx + dx * i, y = sy + dy * i;
+      const v = grid[y]?.[x];
+      if (v === undefined || v === 2) break;  // wall or outside: stop
+      cells.push({ x, y });
+      if (v === 1) { destroyed.push({ x, y }); break; } // crate: destroy, stop
+    }
+  }
+  return { cells, destroyed };
+}
+// BombManager: max 2 live bombs, fuse 2000ms, explosion 500ms.
+// Chain: if fresh blast cells overlap a live bomb → it detonates too.</code></pre></div>
+        <table>
+          <tr><th>Rule</th><th>Value</th></tr>
+          <tr><td>Bomb range</td><td>2 cells in cross</td></tr>
+          <tr><td>Fuse / explosion TTL</td><td>2000 ms / 500 ms</td></tr>
+          <tr><td>Max live bombs</td><td>2 (extra Space presses ignored)</td></tr>
+          <tr><td>Score</td><td>+50 per crate, +200 per enemy, +500 win bonus</td></tr>
+        </table>
+        <h3>Enemies: grid wanderers</h3>
+        <p><code class="inline">Enemy { pos, dirIdx, stepMs: 400 }</code>: steps on a timer; when the next cell isn’t walkable it reverses or picks a random valid direction. Dies when standing on an explosion cell; kills the player on contact (unless invulnerable 2 s after respawn).</p>
+        <div class="tip">Test with a tiny grid: <code class="inline">[[2,2,2],[2,0,1],[2,2,2]]</code> — blast from (1,1) range 2 must include (1,1) and report destroyed <code class="inline">[{x:2,y:1}]</code>, nothing beyond the crate.</div>
+        <div class="check"><input type="checkbox" data-step="bombs" id="c-bombs" /><label for="c-bombs"><strong>Combat tests pass.</strong> Blast stops at walls/crates; enemies reverse on walls.</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#player">← Player</a><a class="btn" href="#engine">Next: Engine →</a></div>
+      </section>
+
+      <!-- STEP 5 -->
+      <section class="step" id="engine">
+        <h2>Step 5 — Engine: rAF loop, fixed-step, states, scoring</h2>
+        <div class="sub">Files: <code class="inline">src/game/game-engine.ts</code> (+ <code class="inline">game-engine.spec.ts</code>) · 30 min</div>
+        <p>One <code class="inline">requestAnimationFrame</code> loop drives everything. Logic runs on a <strong>fixed 120 Hz accumulator</strong> (stable on 60 Hz and 120 Hz+ screens), rendering happens every frame. <code class="inline">dt</code> is clamped to 50 ms so a tab-switch doesn’t tunnel through walls.</p>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>type GameState = "menu" | "playing" | "paused" | "gameover" | "win";
+
+private loop(t: number) {
+  if (this.destroyed) return;
+  const dt = Math.min(t - this.last, 50); // clamp
+  this.last = t;
+  if (this.state === "playing") {
+    this.acc += dt;
+    const STEP = 1000 / 120;
+    while (this.acc &gt;= STEP) { this.tick(STEP); this.acc -= STEP; }
+    this.timeMs += dt;
+  }
+  this.render();           // every rAF, even when paused
+  this.fpsEma = this.fpsEma * 0.95 + (1000 / Math.max(dt, 1)) * 0.05;
+  requestAnimationFrame((tt) =&gt; this.loop(tt));
+}
+
+private tick(stepMs: number) {
+  player.update(stepMs, board, input);
+  if (input.consumeBomb()) bombs.place(player.position.x, player.position.y);
+  if (input.consumePause()) this.pause();
+  const { score, hitCells } = bombs.update(stepMs, board);
+  enemies.forEach((e) =&gt; e.update(stepMs, board));
+  this.collisions(hitCells); // crates +50, enemies +200, player hit -&gt; lives--
+  // win: no crates and no enemies left -&gt; +500, state = "win"
+  // lose: lives 0 -&gt; state = "gameover"
+}</code></pre></div>
+        <table>
+          <tr><th>State</th><th>Loop does</th><th>How to leave</th></tr>
+          <tr><td><code class="inline">menu</code></td><td>renders board, no updates</td><td><kbd>Enter</kbd> / Start button</td></tr>
+          <tr><td><code class="inline">playing</code></td><td>full tick + timer</td><td><kbd>P</kbd>/<kbd>Esc</kbd> → paused</td></tr>
+          <tr><td><code class="inline">paused</code></td><td>rAF continues, updates gated (no fake frame drops)</td><td>Continue / Restart</td></tr>
+          <tr><td><code class="inline">gameover</code>/<code class="inline">win</code></td><td>stats overlay</td><td><kbd>R</kbd> or Restart (full reset, lives back to 3)</td></tr>
+        </table>
+        <div class="check"><input type="checkbox" data-step="engine" id="c-engine" /><label for="c-engine"><strong>Engine tests pass.</strong> Pause gates updates; restart resets score/grid/timers.</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#bombs">← Bombs</a><a class="btn" href="#render">Next: Render →</a></div>
+      </section>
+
+      <!-- STEP 6 -->
+      <section class="step" id="render">
+        <h2>Step 6 — Render + HUD: 2 layers, transform-only, 60 FPS</h2>
+        <div class="sub">Files: <code class="inline">src/render/renderGameboard.ts</code> · <code class="inline">src/style.css</code> · <code class="inline">src/main.ts</code> · 30 min</div>
+        <p><strong>Exactly 2 layers:</strong> (1) a static board of 195 cells built <em>once</em>, (2) an absolutely-positioned entity layer. Per frame we only toggle classes on <em>changed</em> cells and move entities with <code class="inline">transform</code> + <code class="inline">opacity</code> (compositor-only, no layout).</p>
+        <div class="codeblock"><button class="copy">Copy</button><pre><code>/* static layer: build once */
+export function renderGameboard(grid: number[][]) {
+  const root = document.createElement("div");
+  root.id = "static-layer";
+  const cells: HTMLDivElement[] = [];
+  grid.flat().forEach((v) =&gt; {
+    const c = document.createElement("div");
+    c.className = "cell" + (v === 2 ? " wall" : v === 1 ? " crate" : " floor");
+    root.appendChild(c); cells.push(c);
+  });
+  function sync(next: number[][]) { // dirty-cell update only
+    next.flat().forEach((v, i) =&gt; {
+      const want = v === 2 ? "wall" : v === 1 ? "crate" : "floor";
+      if (!cells[i].classList.contains(want)) {
+        cells[i].classList.remove("wall", "crate", "floor");
+        cells[i].classList.add(want);
+      }
+    });
+  }
+  return { root, sync };
+}
+
+/* entity layer: move with transform only */
+#entity-layer { position: absolute; inset: 0; pointer-events: none; }
+.entity {
+  position: absolute; width: 32px; height: 32px;
+  will-change: transform; /* player, bombs, enemies, flames */
+}
+// per frame:
+el.style.transform = `translate3d(${x * 32}px, ${y * 32}px, 0)`;</code></pre></div>
+        <h3>HUD + menus + wiring (<code class="inline">main.ts</code>)</h3>
+        <ul>
+          <li>HUD: <code class="inline">TIME mm:ss</code> (count-up), <code class="inline">SCORE</code>, <code class="inline">LIVES ♥♥♥</code>, <code class="inline">FPS + ms</code>. Throttle text updates (timer/score 4 Hz, FPS 2 Hz) — DOM text is expensive.</li>
+          <li>Overlays: <code class="inline">#menu</code> (title + controls + Start), <code class="inline">#pause</code> (Continue/Restart), <code class="inline">#end</code> (stats + Restart). Buttons clickable <em>and</em> keyboard (<kbd>Enter</kbd>/<kbd>R</kbd>).</li>
+          <li>Never read layout in the loop; grid math stays on integers; <code class="inline">will-change: transform</code> on ~10 entity nodes max.</li>
+        </ul>
+        <table>
+          <tr><th>Keys</th><th>Action</th></tr>
+          <tr><td><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> / <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></td><td>Hold to keep stepping (150 ms/cell)</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Drop bomb (max 2, snaps to your cell)</td></tr>
+          <tr><td><kbd>P</kbd> / <kbd>Esc</kbd></td><td>Pause / resume</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>R</kbd></td><td>Start / confirm / restart</td></tr>
+        </table>
+        <div class="check"><input type="checkbox" data-step="render" id="c-render" /><label for="c-render"><strong>Render test passes + <code class="inline">npm run build</code> succeeds.</strong> Crate removal syncs without rebuilding the board.</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#engine">← Engine</a><a class="btn" href="#playtest">Next: Playtest →</a></div>
+      </section>
+
+      <!-- STEP 7 -->
+      <section class="step" id="playtest">
+        <h2>Step 7 — Playtest, measure, go further</h2>
+        <div class="sub">Manual QA + ideas · 15 min</div>
+        <h3>Playtest checklist</h3>
+        <ul>
+          <li>Hold each arrow: smooth stepping, no spam needed; walls block.</li>
+          <li>Space near a crate: cross blast (range 2), crate → floor, +50.</li>
+          <li>Enemy touches blast → +200; enemy touches you → life lost, 2 s invulnerability, respawn at (1,1).</li>
+          <li>P pauses (overlay, FPS keeps running, no frame drops); Enter/R restarts cleanly.</li>
+          <li>DevTools → Performance: record 10 s, confirm ~60 FPS, no layout thrash; enable paint flashing — only entities should repaint.</li>
+        </ul>
+        <h3>Ideas to go further (pick one)</h3>
+        <ul>
+          <li>🔥 Power-ups: range+1 or extra bomb slot hidden under crates.</li>
+          <li>👾 Second enemy type: faster (250 ms) but only horizontal.</li>
+          <li>📱 Touch controls: swipe = held direction, tap = bomb.</li>
+          <li>🔊 WebAudio bleeps: place / explode / hurt / win (no assets needed).</li>
+          <li>🏆 Local high-score in <code class="inline">localStorage</code>.</li>
+        </ul>
+        <div class="check"><input type="checkbox" data-step="playtest" id="c-playtest" /><label for="c-playtest"><strong>I playtested and measured FPS.</strong> The game is done!</label></div>
+        <div class="stepnav"><a class="btn ghost" href="#render">← Render</a><a class="btn" href="/">▶ Back to game</a></div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    Tutorial mirrors <code>docs/superpowers/specs/2026-10-04-bomberman-grid-step-design.md</code> and <code>docs/superpowers/plans/2026-10-04-bomberman-grid-step.md</code> in this repo.
+    Tiles: 0 floor · 1 crate · 2 wall · grid 15×13 · step 150 ms · bomb fuse 2000 ms · range 2.
+  </footer>
+
+  <script>
+    // Copy buttons
+    document.querySelectorAll('.codeblock').forEach(function (block) {
+      var btn = block.querySelector('.copy');
+      var pre = block.querySelector('pre');
+      if (!btn || !pre) return;
+      btn.addEventListener('click', function () {
+        var text = pre.innerText;
+        if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1200);
+      });
+    });
+
+    // Progress checkboxes persisted in localStorage
+    var KEYS = ['setup','input','board','player','bombs','engine','render','playtest'];
+    var bar = document.getElementById('progressBar');
+    var label = document.getElementById('progressText');
+    function refresh() {
+      var done = KEYS.filter(function (k) {
+        try { return localStorage.getItem('bomberman-tut-' + k) === '1'; } catch (e) { return false; }
+      });
+      bar.style.width = (done.length / KEYS.length * 100) + '%';
+      label.textContent = done.length + ' / ' + KEYS.length + ' steps done';
+    }
+    document.querySelectorAll('input[type="checkbox"][data-step]').forEach(function (box) {
+      var k = box.getAttribute('data-step');
+      try { box.checked = localStorage.getItem('bomberman-tut-' + k) === '1'; } catch (e) {}
+      box.addEventListener('change', function () {
+        try { localStorage.setItem('bomberman-tut-' + k, box.checked ? '1' : '0'); } catch (e) {}
+        refresh();
+      });
+    });
+    refresh();
+
+    // TOC active link on scroll
+    var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+    var sections = tocLinks.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          tocLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id); });
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(function (s) { obs.observe(s); });
+
+    // Mini grid-step demo (9x7, walls border + pillars, 150ms cooldown feel)
+    (function () {
+      var W = 9, H = 7;
+      var board = document.getElementById('demoBoard');
+      if (!board) return;
+      var px = 1, py = 1, lastMove = 0;
+      function isWall(x, y) {
+        if (x === 0 || y === 0 || x === W - 1 || y === H - 1) return true;
+        return x % 2 === 0 && y % 2 === 0;
+      }
+      function draw() {
+        board.innerHTML = '';
+        for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+          var d = document.createElement('div');
+          d.className = 'demo-cell' + (isWall(x, y) ? ' wall' : '') + ((x === px && y === py) ? ' me' : '');
+          if (x === px && y === py) d.textContent = '●';
+          board.appendChild(d);
+        }
+      }
+      function step(dx, dy) {
+        var now = performance.now();
+        if (now - lastMove < 150) return; // same cooldown as the real game
+        lastMove = now;
+        var nx = px + dx, ny = py + dy;
+        if (!isWall(nx, ny)) { px = nx; py = ny; draw(); }
+      }
+      var DIRS = { up: [0,-1], down: [0,1], left: [-1,0], right: [1,0] };
+      document.querySelectorAll('[data-demo]').forEach(function (b) {
+        b.addEventListener('click', function () { var d = DIRS[b.getAttribute('data-demo')]; step(d[0], d[1]); board.focus(); });
+      });
+      document.getElementById('demoReset').addEventListener('click', function () { px = 1; py = 1; draw(); board.focus(); });
+      board.addEventListener('keydown', function (e) {
+        var m = { ArrowUp: [0,-1], ArrowDown: [0,1], ArrowLeft: [-1,0], ArrowRight: [1,0] }[e.code];
+        if (m) { e.preventDefault(); step(m[0], m[1]); }
+      });
+      draw();
+    })();
+  </script>
+</body>
+</html>

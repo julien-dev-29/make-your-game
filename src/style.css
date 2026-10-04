@@ -16,15 +16,21 @@ body {
   z-index: 50;
   width: 32px;
   height: 32px;
-  background-color: #1D603A;
+  background-color: #1d603a;
 }
 
 .wall {
   background-color: #696969;
-  box-shadow: inset 3px 3px #424242, inset -3px -3px #C2C2C2;
+  box-shadow:
+    inset 3px 3px #424242,
+    inset -3px -3px #c2c2c2;
 }
 
 .gameboard {
   display: grid;
   grid-template-columns: repeat(15, 1fr);
+}
+
+.player {
+  background-color: aqua;
 }
