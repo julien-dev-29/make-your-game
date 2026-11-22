@@ -1,3 +1,8 @@
+:root {
+  --cube-size: 512px;
+  --cube-half: 256px;
+}
+
 *,
 *::after,
 ::before {
@@ -10,19 +15,13 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background-color: black;
   color: rgb(230, 230, 230);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
 }
 
 .viewport {
   position: relative;
-  perspective: 1000px;
-  perspective-origin: 50% 50%;
   width: 100vw;
   height: 100vh;
+  perspective: 512px;
   overflow: hidden;
 }
 
@@ -30,14 +29,54 @@ body {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
-  transition: transform 0.1s ease-out;
 }
 
-.world,
-.entity {
+.world {
+  position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  position: relative;
+}
+
+.wall {
+  position: absolute;
+  top: 25%;
+  left: 33%;
+  height: var(--cube-size);
+  width: var(--cube-size);
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(var(--cube-half));
+}
+.right {
+  transform: rotateY(90deg) translateZ(var(--cube-half));
+}
+.left {
+  transform: rotateY(-90deg) translateZ(var(--cube-half));
+}
+.top {
+  transform: rotateX(90deg) translateZ(var(--cube-half));
+}
+.bottom {
+  transform: rotateX(-90deg) translateZ(var(--cube-half));
+}
+
+.enemy {
+  position: absolute;
+  top: 25%;
+  left: 46%;
+  width: 68px;
+  height: 237px;
+  background: url(assets/resized-512x237.png);
+  animation: sprite-play 1s steps(7) infinite;
+}
+
+@keyframes sprite-play {
+  from {
+    background-position: 0;
+  }
+  to {
+    background-position: -512px;
+  }
 }
